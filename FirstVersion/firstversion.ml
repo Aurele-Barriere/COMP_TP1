@@ -36,40 +36,42 @@ and token_string s_read = parser
 
 (* Printing according to Ntriples syntax *)
 let print_ntriple (subject : string) (predicate : string) (obj : string) =
-  Printf.printf "<<%s>> <<%s>> <<%s>>.\n" subject predicate obj
+Printf.printf "<<%s>> <<%s>> <<%s>>.\n" subject predicate obj
+
+
 
 
 let rec parse_document = parser
-| [< s1 = parse_subject; 'Point; s2 = parse_document >] ->  ()
-| [< >] -> ()
+| [< s1 = parse_subject; 'Point; s2 = parse_document >] ->  s1 ^ s2
+| [< >] -> ""
 
 and parse_subject = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket; p1 = parse_predicate_list id >] -> ()
+| [< 'LeftBracket; 'S(id); 'RightBracket; p1 = parse_predicate_list id >] -> p1
 
 and parse_predicate_list subj = parser
-| [< p1 = parse_predicate subj ; p2 = parse_predicate_list_aux subj >] -> ()
+| [< p1 = parse_predicate subj ; p2 = parse_predicate_list_aux subj >] -> p1 ^ p2
 
 and parse_predicate_list_aux subj = parser
-| [< 'Semicolon; p1 = parse_predicate_list subj >] -> ()
-| [< >] -> ()
+| [< 'Semicolon; p1 = parse_predicate_list subj >] -> p1
+| [< >] -> ""
 
 and parse_predicate subj = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket; o1 = parse_object_list subj id >] -> ()
+| [< 'LeftBracket; 'S(id); 'RightBracket; o1 = parse_object_list subj id >] -> o1
 
 and parse_object_list subj pred = parser
-| [< o1 = parse_object subj pred; o2 = parse_object_list_aux subj pred >] -> ()
+| [< o1 = parse_object subj pred; o2 = parse_object_list_aux subj pred >] -> o1 ^ o2
 
 and parse_object_list_aux subj pred = parser
-| [< 'Comma; o1 = parse_object_list subj pred >] -> ()
-| [< >] -> ()
+| [< 'Comma; o1 = parse_object_list subj pred >] -> o1
+| [< >] -> ""
 
 and parse_object subj pred = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket >] -> print_ntriple subj pred id
-| [< 'Quote; 'S(id); 'Quote >] -> print_ntriple subj pred id
+| [< 'LeftBracket; 'S(id); 'RightBracket >] -> "<<" ^ subj ^ ">>" ^ "<<" ^ pred ^ ">>" ^ "<<" ^ id ^ ">>" ^ ".\n" 
+| [< 'Quote; 'S(id); 'Quote >] -> "<<" ^ subj ^ ">>" ^ "<<" ^ pred ^ ">>" ^ "<<" ^ id ^ ">>" ^ ".\n" 
 
 
 
-let test s = parse_document (lex (Stream.of_string s))
+let test s = print_string(parse_document (lex (Stream.of_string s)))
 
 let _ = test "<1> <2> <3>, <4>; <5> <6>."
 
