@@ -34,63 +34,43 @@ and token_string s_read = parser
 | [< >] -> s_read
 
 
+(* Printing according to Ntriples syntax *)
+let print_ntriple (subject : string) (predicate : string) (obj : string) =
+  Printf.printf "<<%s>> <<%s>> <<%s>>.\n" subject predicate obj
+
+
 let rec parse_document = parser
-| [< s1 = parse_subject; 'Point; s2 = parse_document >] -> ""
-| [< >] ->""
+| [< s1 = parse_subject; 'Point; s2 = parse_document >] ->  ()
+| [< >] -> ()
 
 and parse_subject = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket; p1 = parse_predicate_list >] ->""
+| [< 'LeftBracket; 'S(id); 'RightBracket; p1 = parse_predicate_list id >] -> ()
 
-and parse_predicate_list = parser
-| [< p1 = parse_predicate; p2 = parse_predicate_list_aux >] ->""
+and parse_predicate_list subj = parser
+| [< p1 = parse_predicate subj ; p2 = parse_predicate_list_aux subj >] -> ()
 
-and parse_predicate_list_aux = parser
-| [< 'Semicolon; p1 = parse_predicate_list >] ->""
-| [< >] ->""
+and parse_predicate_list_aux subj = parser
+| [< 'Semicolon; p1 = parse_predicate_list subj >] -> ()
+| [< >] -> ()
 
-and parse_predicate = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket; o1 = parse_object_list >] ->""
+and parse_predicate subj = parser
+| [< 'LeftBracket; 'S(id); 'RightBracket; o1 = parse_object_list subj id >] -> ()
 
-and parse_object_list = parser
-| [< o1 = parse_object; o2 = parse_object_list_aux >] ->""
+and parse_object_list subj pred = parser
+| [< o1 = parse_object subj pred; o2 = parse_object_list_aux subj pred >] -> ()
 
-and parse_object_list_aux = parser
-| [< 'Comma; o1 = parse_object_list >] ->""
-| [< >] ->""
+and parse_object_list_aux subj pred = parser
+| [< 'Comma; o1 = parse_object_list subj pred >] -> ()
+| [< >] -> ()
 
-and parse_object = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket >] ->""
-| [< 'Quote; 'S(id); 'Quote >] ->""
+and parse_object subj pred = parser
+| [< 'LeftBracket; 'S(id); 'RightBracket >] -> print_ntriple subj pred id
+| [< 'Quote; 'S(id); 'Quote >] -> print_ntriple subj pred id
 
-(* type expr = Num of int | Add of expr * expr | Sub of expr * expr | Mul of expr * expr   => NO AST for now*)
 
-(* The recursive descent parser consists of three mutually-recursive functions: *)
-(* 
-let rec parse_expr = parser
-  | [< e1 = parse_factor; e2 = parse_expr_aux e1 >] -> e2
 
-and parse_expr_aux e1 = parser
-  | [< 'Plus; e2 = parse_factor; e3 = parse_expr_aux (Add (e1,e2)) >] -> e3
-  | [< 'Minus; e2 = parse_factor; e3 = parse_expr_aux (Sub (e1,e2)) >] -> e3
-  | [< >] -> e1
+let test s = parse_document (lex (Stream.of_string s))
 
-and parse_factor = parser
-  | [< e1 = parse_atom; e2 = parse_factor_aux e1 >] -> e2
+let _ = test "<1> <2> <3>, <4>; <5> <6>."
 
-and parse_factor_aux e1 = parser
-  | [< 'Times; e2 = parse_atom; e3 = parse_factor_aux (Mul (e1,e2)) >] -> e3
-  | [< >] -> e1
 
-and parse_atom = parser
-  | [< 'Int n >] -> Num n
-  | [< 'LeftBracket; e = parse_expr; 'RightBracket >] -> e
-
-(* That is all that is required to parse simple arithmetic
-expressions. We can test it by lexing and parsing a string to get the
-abstract syntax tree representing the expression: *)
-
-let test s = parse_expr (lex (Stream.of_string s))
-
-let _ = test "1+2*(3+4)-5"
-(*- : expr = Sub (Add (Num 1, Mul (Num 2, Add (Num 3, Num 4))), 5) *)
-*)
