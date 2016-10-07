@@ -28,21 +28,17 @@ and token = parser
   | [< ' ('<') >] -> LeftBracket
   | [< ' ('>') >] -> RightBracket
   | [< ' ('"') >] -> Quote
-  | [< 'c when (c>= '1' && c <= '9') || (c>= 'a' && c<='z'); s = token_string (string_of_char c) >] -> S s
+  | [< 'c when (c>= '1' && c <= '9') || (c>= 'a' && c<='z') || (c>= 'A' && c<='Z') ; s = token_string (string_of_char c) >] -> S s
 and token_string s_read = parser
-| [< 'c when (c>= '1' && c <= '9') || (c>= 'a' && c<='z'); s = token_string((String.make 1 c) ^ s_read) >] -> s
+| [< 'c when (c>= '1' && c <= '9') || (c>= 'a' && c<='z') || (c>= 'A' && c<='Z') || (c=' ') || (c='-'); s = token_string(s_read ^ (String.make 1 c)) >] -> s
 | [< >] -> s_read
 
-
-(* Printing according to Ntriples syntax *)
-let print_ntriple (subject : string) (predicate : string) (obj : string) =
-Printf.printf "<<%s>> <<%s>> <<%s>>.\n" subject predicate obj
-
-
-
+(* Ntriples strings *)
+let make_ntriple_string subj pred obj =
+"<<" ^ subj ^ ">>" ^ "<<" ^ pred ^ ">>" ^ "<<" ^ obj ^ ">>" ^ ".\n" 
 
 let rec parse_document = parser
-| [< s1 = parse_subject; 'Point; s2 = parse_document >] ->  s1 ^ s2
+| [< s1 = parse_subject; 'Point ?? "point expected"; s2 = parse_document >] ->  s1 ^ s2
 | [< >] -> ""
 
 and parse_subject = parser
@@ -66,13 +62,26 @@ and parse_object_list_aux subj pred = parser
 | [< >] -> ""
 
 and parse_object subj pred = parser
-| [< 'LeftBracket; 'S(id); 'RightBracket >] -> "<<" ^ subj ^ ">>" ^ "<<" ^ pred ^ ">>" ^ "<<" ^ id ^ ">>" ^ ".\n" 
-| [< 'Quote; 'S(id); 'Quote >] -> "<<" ^ subj ^ ">>" ^ "<<" ^ pred ^ ">>" ^ "<<" ^ id ^ ">>" ^ ".\n" 
+| [< 'LeftBracket; 'S(id); 'RightBracket >] -> make_ntriple_string subj pred id
+| [< 'Quote; 'S(id); 'Quote >] -> make_ntriple_string subj pred id
 
 
 
-let test s = print_string(parse_document (lex (Stream.of_string s)))
+let test s =
+print_string s; print_newline (); print_newline (); print_newline ();
+print_string(parse_document (lex (Stream.of_string s)))
 
-let _ = test "<1> <2> <3>, <4>; <5> <6>."
+let read_file (filename : string) =
+let lines = ref "" in
+let chan = open_in filename in
+try
+while true; do
+lines := !lines ^ input_line chan   
+done; !lines
+with End_of_file ->
+close_in chan;
+!lines ;;
 
+
+ let _ = test (read_file "../../tests/test1.ttl")  
 
