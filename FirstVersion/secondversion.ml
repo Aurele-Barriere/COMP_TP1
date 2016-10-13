@@ -10,7 +10,9 @@ let test s =
   Printf.printf "Original string : \n%s\n\n" s;
   Printf.printf "Printing the AST :\n"  ;
   print_ast(d);
-  Printf.printf "\n It has %d description\n" (count_description d)
+  Printf.printf "It has %d description\n" (count_description d);
+  Printf.printf "Corresponding Ntriple string :\n";
+  Printf.printf "%s" (produce_ntriple d)
 
 let read_file (filename : string) =
 let lines = ref "" in
@@ -25,5 +27,5 @@ close_in chan;
 
 
   (*  let _ = test (read_file "../../tests/test1.ttl")  *)
-let _ = test("<poly117> <type> \"test&\" .")
+let _ = test("<poly117> <type> \"test&\"; <a> <b>,<c> .<zoef><szf> <zrgj>.")
                                                                   

@@ -5,19 +5,19 @@ open Astparser
 
 let obj_to_string (o:obj)=
   match o with
-  | I(e) -> " | | <" ^ e ^ ">"
-  | S(t) -> " | | \"" ^ t ^ "\""
+  | I(e) -> " | | " ^ e ^ "\n"
+  | S(t) -> " | | \"" ^ t ^ "\"\n"
 
 let predicate_to_string ((e,ol):predicate) =
   " | " ^ e ^ "\n" ^
     (List.fold_right
-       (fun o l -> obj_to_string(o) ^ "\n" ^ l)
+       (fun o l -> obj_to_string(o) ^ l)
        ol "")
 
 let subject_to_string ((e,pl):subject) =
   e ^ "\n" ^
     (List.fold_right
-       (fun p l -> predicate_to_string(p) ^ "\n" ^ l)
+       (fun p l -> predicate_to_string(p) ^ l)
        pl "")
 
 let document_to_string (sl : document) =
@@ -30,7 +30,7 @@ let print_ast (d : document) =
 
    
 let produce_ntriple (d : document) =
-  "" (* TO DO *)
+  "TO DO" 
 
 let rec count_description (d : document) =
   match d with
