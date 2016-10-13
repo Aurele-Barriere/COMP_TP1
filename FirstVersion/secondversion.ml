@@ -12,8 +12,8 @@ let test s =
   print_ast(d);
   Printf.printf "It has %d description\n" (count_description d);
   Printf.printf "Corresponding Ntriple string :\n";
-  Printf.printf "%s" (produce_ntriple d)
-
+  produce_ntriple d
+                  
 let read_file (filename : string) =
 let lines = ref "" in
 let chan = open_in filename in
