@@ -6,8 +6,11 @@ open Walker
 
 
 let test s =
-print_string s; print_newline (); print_newline (); print_newline ();
-print_ast(parse_document (lex (Stream.of_string s)))
+  let d = parse_document(lex(Stream.of_string s)) in
+  Printf.printf "Original string : \n%s\n\n" s;
+  Printf.printf "Printing the AST :\n"  ;
+  print_ast(d);
+  Printf.printf "\n It has %d description\n" (count_description d)
 
 let read_file (filename : string) =
 let lines = ref "" in

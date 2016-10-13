@@ -32,5 +32,8 @@ let print_ast (d : document) =
 let produce_ntriple (d : document) =
   "" (* TO DO *)
 
-let count_description (d : document) =
-  0 (* TO DO *)
+let rec count_description (d : document) =
+  match d with
+  | [] -> 0
+  | h::t -> 1 + count_description t
+               
