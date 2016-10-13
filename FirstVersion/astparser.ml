@@ -12,9 +12,7 @@ type predicate = entity * (obj list)
 type subject = entity * (predicate list)
 type document = subject list                      
 
-let print_ast (d : document) =
-  Printf.printf("TO DO : print an AST\n")
-                        
+                     
        
 (* Parsing *)
 let rec parse_document = parser

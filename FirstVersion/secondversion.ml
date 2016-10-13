@@ -2,7 +2,7 @@
 open String
 open Lexer
 open Astparser
-
+open Walker
 
 
 let test s =
