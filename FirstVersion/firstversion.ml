@@ -1,7 +1,7 @@
 (* Translation from Turtle  to Ntriple *)
 open String
 open Lexer
-open Parser
+open Firstparser
 
 
 

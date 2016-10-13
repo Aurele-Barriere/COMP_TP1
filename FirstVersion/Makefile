@@ -1,10 +1,10 @@
 all : firstversion
 
-firstversion : lexer.ml parser.ml firstversion.ml
+firstversion : lexer.ml firstparser.ml firstversion.ml
 	ocamlc -c -pp "camlp4o" lexer.ml
-	ocamlc -c -pp "camlp4o" parser.ml
+	ocamlc -c -pp "camlp4o" firstparser.ml
 	ocamlc -c -pp "camlp4o" firstversion.ml
-	ocamlc -pp "camlp4o" lexer.cmo parser.cmo firstversion.cmo -o firstversion
+	ocamlc -pp "camlp4o" lexer.cmo firstparser.cmo firstversion.cmo -o firstversion
 
 clean :
 	-rm *.cmi
