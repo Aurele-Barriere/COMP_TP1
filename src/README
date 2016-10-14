@@ -1,0 +1,9 @@
+COMP TP1
+Aurèle Barrière & Antonin Garret
+
+The Makefile produces 3 versions :
+    - the first one (firstversion) directly builds Ntriples without an AST. It uses the files {lexer.ml, firstparser.ml, firstversion.ml}
+
+    - the second one (secondversion) builds an AST, then uses different walker functions to build Ntriples, count descriptions, build XML or print the AST. It uses the files {lexer.ml, astparser.ml, walker.ml, secondversion.ml}
+
+    - the third one (anonymousversion) is similar, but handles anonymous nodes.
