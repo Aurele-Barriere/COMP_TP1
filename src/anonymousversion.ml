@@ -1,8 +1,8 @@
 (* Translation from Turtle  to Ntriple *)
 open String
-open Lexer
-open Astparser
-open Walker
+open Anonymouslexer
+open Anonymousparser
+open Anonymouswalker
 
 
 let test s =

@@ -21,6 +21,6 @@ close_in chan;
 !lines ;;
 
 
-  (*  let _ = test (read_file "../../tests/test1.ttl")  *)
-let _ = test("<poly117> <type> \"test&\" .")
+let _ = test (read_file "../tests/test1.ttl") 
+(*let _ = test("<poly117> <type> \"test&\" .")*)
                                                                   
