@@ -12,7 +12,10 @@ let test s =
   print_ast(d);
   Printf.printf "It has %d description\n" (count_description d);
   Printf.printf "Corresponding Ntriple string :\n";
-  produce_ntriple d
+  produce_ntriple d;
+  Printf.printf "Corresponding XML string :\n";
+  produce_xml d
+
                   
 let read_file (filename : string) =
 let lines = ref "" in

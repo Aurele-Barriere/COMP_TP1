@@ -55,8 +55,39 @@ let document_to_ntriple (sl : document) =
 let produce_ntriple (d : document) =
   Printf.printf "%s" (document_to_ntriple d)
 
+(* Counting descriptions *)
 let rec count_description (d : document) =
   match d with
   | [] -> 0
   | h::t -> 1 + count_description t
                
+
+(* Producing XML *)
+let obj_to_xml (p:entity) (o:obj)=
+  match o with
+  | I(e) -> "\t<" ^ p ^ " rdf:resource=\"" ^ e ^ "\"/>\n"
+  | S(t) -> "\t<" ^ p ^ ">" ^ t ^ "</" ^ p ^ ">\n"
+
+let predicate_to_xml ((e,ol):predicate) =
+    (List.fold_right
+       (fun o l -> (obj_to_xml e o) ^ l)
+       ol "")
+
+let subject_to_xml ((e,pl):subject) =
+"<rdf:Description rdf:about=\"" ^ e ^ "\">\n" ^
+    (List.fold_right
+       (fun p l -> (predicate_to_xml p) ^ l)
+       pl "") ^
+"</rdf:Description>\n"
+
+let document_to_xml (sl : document) =
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rdf:RDF\nxml:base=\"http://mydomain.org/myrdf/\"\nxmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" ^
+  (List.fold_right
+     (fun s l -> subject_to_xml(s) ^ l)
+     sl "") ^
+"</rdf:RDF>\n"
+
+
+                
+let produce_xml (d : document) =
+  Printf.printf "%s" (document_to_xml d)
