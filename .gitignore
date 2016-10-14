@@ -1,5 +1,6 @@
 *~
-FirstVersion/firstversion
-FirstVersion/secondversion
+src/firstversion
+src/secondversion
+src/anonymousversion
 *.cmi
 *.cmo
