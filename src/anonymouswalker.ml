@@ -3,6 +3,7 @@
 
 open Anonymousparser
 
+(* A first walker to test our parser *)
 let obj_to_string (o:obj)=
   match o with
   | I(e) -> " | | " ^ e ^ "\n"
@@ -32,8 +33,9 @@ let print_ast (d : document) =
 
 let obj_to_ntriple (s:entity) (p:entity) (o:obj)=
   match o with
-  | I(e) -> "[<"^s^">]"^"[<"^p^">]"^"[<"^e^">].\n"
-  | S(t) -> "[<"^s^">]"^"[<"^p^">]"^"[\""^t^"\"].\n"
+  | I(e) -> "<"^s^">"^"<"^p^">"^"<"^e^">.\n"
+  | S(t) -> "<"^s^">"^"<"^p^">"^"\""^t^"\".\n"
+  | P(p) -> "" (*TO DO *)
 
 let predicate_to_ntriple (s:entity) ((e,ol):predicate) =
     (List.fold_right
@@ -87,7 +89,6 @@ let document_to_xml (sl : document) =
      sl "") ^
 "</rdf:RDF>\n"
 
-
-                
+            
 let produce_xml (d : document) =
   Printf.printf "%s" (document_to_xml d)
