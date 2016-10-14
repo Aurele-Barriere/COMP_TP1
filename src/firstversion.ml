@@ -7,6 +7,7 @@ open Firstparser
 
 let test s =
 print_string s; print_newline (); print_newline (); print_newline ();
+print_string "Ntriples : "; print_newline();
 print_string(parse_document (lex (Stream.of_string s)))
 
 let read_file (filename : string) =

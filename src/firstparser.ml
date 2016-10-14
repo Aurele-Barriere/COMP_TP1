@@ -6,12 +6,14 @@ open String
 
 (* Ntriples strings *)
 let make_ntriple_string subj pred obj =
-"[<" ^ subj ^ ">]" ^ "[<" ^ pred ^ ">]" ^ "[\"" ^ obj ^ "\"]" ^ ".\n"
+"<" ^ subj ^ ">" ^ "<" ^ pred ^ ">" ^ "\"" ^ obj ^ "\"" ^ ".\n"
 
 let make_ntriple_id subj pred obj =
-  "[<" ^ subj ^ ">]" ^ "[<" ^ pred ^ ">]" ^ "[<" ^ obj ^ ">]" ^ ".\n"
+  "<" ^ subj ^ ">" ^ "<" ^ pred ^ ">" ^ "<" ^ obj ^ ">" ^ ".\n"
        
 (* Parsing *)
+(* Using herited arguments to transmit subjects and predicates to objects *)
+(* One synthetized argument : the built string *)
 let rec parse_document = parser
 | [< s1 = parse_subject; 'Point ?? "point expected"; s2 = parse_document >] ->  s1 ^ s2
 | [< >] -> ""

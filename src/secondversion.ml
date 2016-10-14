@@ -30,5 +30,5 @@ close_in chan;
 
 
 let _ = test (read_file "../tests/test1.ttl")
-(*let _ = test("<poly117> <type> \"test&\"; <a> <b>,<c> .<zoef><szf> <zrgj>.")*)
+(*let _ = test("<poly117> <type> \"test&\"; <a> <b>,<c> .<d><e> <f>.")*)
                                                                   

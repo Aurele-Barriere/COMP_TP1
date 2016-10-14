@@ -5,6 +5,7 @@ open Lexer
 open String
 open List
 
+(* We define the AST of a document *)
 type entity = string
 type text = string
 type obj = I of entity | S of text
@@ -15,6 +16,8 @@ type document = subject list
                      
        
 (* Parsing *)
+(* Using synthetized  arguments to build the AST *)
+
 let rec parse_document = parser
 | [< s1 = parse_subject; 'Point ?? "point expected"; s2 = parse_document >] -> s1 :: s2
 | [< >] -> []
