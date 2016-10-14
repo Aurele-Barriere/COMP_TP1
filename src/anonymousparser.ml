@@ -7,8 +7,8 @@ open List
 
 type entity = string
 type text = string
-type obj = I of entity | S of text
-type predicate = entity * (obj list)
+type obj = I of entity | S of text | P of (predicate list)
+and predicate = entity * (obj list)
 type subject = entity * (predicate list)
 type document = subject list                      
 
@@ -42,3 +42,4 @@ and parse_object_list_aux = parser
 and parse_object = parser
 | [< 'Id(s) >] -> I(s)
 | [< 'Str(s) >] -> S(s)
+| [< 'LeftBracket; p = parse_predicate_list; 'RightBracket >] -> P(p)

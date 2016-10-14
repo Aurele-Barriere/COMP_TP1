@@ -4,7 +4,7 @@
 
 (* First, we define the tokens (lexical units) *)
 
-type token = Point | Semicolon | Comma | Str of string | Id of string
+type token = Point | Semicolon | Comma | Str of string | Id of string | LeftBracket | RightBracket
 
 (* Then we define the lexer, using stream parsers with only right recursion *)
 
@@ -29,6 +29,8 @@ and token = parser
   | [< ' ('.') >] -> Point
   | [< ' (',') >] -> Comma
   | [< ' (';') >] -> Semicolon
+  | [< ' ('[') >] -> LeftBracket
+  | [< ' (']') >] -> RightBracket 
   | [< 'c when is_id_first_char c; s = token_id "" >] -> Id s
   | [< 'c when is_string_first_char c; s = token_string "" >] -> Str s
 and token_id s_read = parser
