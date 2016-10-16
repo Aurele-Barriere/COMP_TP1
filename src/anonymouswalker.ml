@@ -8,6 +8,7 @@ let obj_to_string (o:obj)=
   match o with
   | I(e) -> " | | " ^ e ^ "\n"
   | S(t) -> " | | \"" ^ t ^ "\"\n"
+  | P(pl) -> "" (*TODO*)
 
 let predicate_to_string ((e,ol):predicate) =
   " | " ^ e ^ "\n" ^
@@ -29,13 +30,34 @@ let document_to_string (sl : document) =
 let print_ast (d : document) =
   Printf.printf "%s" (document_to_string d)
 
-(* generating Ntriple string *)                
+(* generating Ntriple string *)
+
+let n_id = ref 0  
+
+let anonymous_obj_to_string (o:obj)=
+  match o with
+  | I(e) -> " " ^ e
+  | S(t) -> " \"" ^ t ^ "\""
+  | P(pl) -> ""
+  
+let anonymous_predicate_to_string ((e,ol):predicate) =
+  "_:id" ^ (string_of_int (!n_id)) ^ " <" ^ e ^ ">" ^
+    (List.fold_right
+       (fun o l -> 	anonymous_obj_to_string(o) ^ l)
+       ol "") ^ " .\n"
+       
+let plist_to_string (pl: predicate list) =
+  (List.fold_right
+    (fun p l -> (anonymous_predicate_to_string p) ^ l)
+     pl "")
+  
 
 let obj_to_ntriple (s:entity) (p:entity) (o:obj)=
   match o with
-  | I(e) -> "<"^s^">"^"<"^p^">"^"<"^e^">.\n"
-  | S(t) -> "<"^s^">"^"<"^p^">"^"\""^t^"\".\n"
-  | P(p) -> "" (*TO DO *)
+  | I(e) -> "<"^s^"> "^"<"^p^"> "^"<"^e^">.\n"
+  | S(t) -> "<"^s^"> "^"<"^p^"> "^"\""^t^"\".\n"
+  | P(pl) -> incr n_id;
+	"<"^s^"> "^"<"^p^"> _:id"^(string_of_int (!n_id))^" .\n"^(plist_to_string pl)
 
 let predicate_to_ntriple (s:entity) ((e,ol):predicate) =
     (List.fold_right
@@ -69,6 +91,7 @@ let obj_to_xml (p:entity) (o:obj)=
   match o with
   | I(e) -> "\t<" ^ p ^ " rdf:resource=\"" ^ e ^ "\"/>\n"
   | S(t) -> "\t<" ^ p ^ ">" ^ t ^ "</" ^ p ^ ">\n"
+  | P(pl) -> "" (*TODO*)
 
 let predicate_to_xml ((e,ol):predicate) =
     (List.fold_right
