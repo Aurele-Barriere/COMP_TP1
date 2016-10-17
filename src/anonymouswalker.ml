@@ -3,56 +3,29 @@
 
 open Anonymousparser
 
-(* A first walker to test our parser *)
-let obj_to_string (o:obj)=
-  match o with
-  | I(e) -> " | | " ^ e ^ "\n"
-  | S(t) -> " | | \"" ^ t ^ "\"\n"
-  | P(pl) -> "" (*TODO*)
-
-let predicate_to_string ((e,ol):predicate) =
-  " | " ^ e ^ "\n" ^
-    (List.fold_right
-       (fun o l -> obj_to_string(o) ^ l)
-       ol "")
-
-let subject_to_string ((e,pl):subject) =
-  e ^ "\n" ^
-    (List.fold_right
-       (fun p l -> predicate_to_string(p) ^ l)
-       pl "")
-
-let document_to_string (sl : document) =
-  (List.fold_right
-     (fun s l -> subject_to_string(s) ^ "\n" ^ l)
-     sl "")
-       
-let print_ast (d : document) =
-  Printf.printf "%s" (document_to_string d)
-
 (* generating Ntriple string *)
 
 let n_id = ref 0  
 
-let anonymous_obj_to_string (o:obj)=
+let rec anonymous_obj_to_string (o:obj)=
   match o with
   | I(e) -> " " ^ e
   | S(t) -> " \"" ^ t ^ "\""
-  | P(pl) -> ""
+  | P(pl) -> incr n_id;
+	" _id"^(string_of_int (!n_id))^" .\n"^(plist_to_string pl)
   
-let anonymous_predicate_to_string ((e,ol):predicate) =
-  "_:id" ^ (string_of_int (!n_id)) ^ " <" ^ e ^ ">" ^
+and anonymous_predicate_to_string ((e,ol):predicate) =
     (List.fold_right
-       (fun o l -> 	anonymous_obj_to_string(o) ^ l)
-       ol "") ^ " .\n"
+       (fun o l -> 	"_:id" ^ (string_of_int (!n_id)) ^ " <" ^ e ^ ">" ^anonymous_obj_to_string(o) ^ " .\n" ^ l)
+       ol "") 
        
-let plist_to_string (pl: predicate list) =
+and plist_to_string (pl: predicate list) =
   (List.fold_right
     (fun p l -> (anonymous_predicate_to_string p) ^ l)
      pl "")
   
 
-let obj_to_ntriple (s:entity) (p:entity) (o:obj)=
+and obj_to_ntriple (s:entity) (p:entity) (o:obj)=
   match o with
   | I(e) -> "<"^s^"> "^"<"^p^"> "^"<"^e^">.\n"
   | S(t) -> "<"^s^"> "^"<"^p^"> "^"\""^t^"\".\n"

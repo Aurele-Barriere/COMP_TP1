@@ -7,10 +7,6 @@ open Anonymouswalker
 
 let test s =
   let d = parse_document(lex(Stream.of_string s)) in
-  Printf.printf "Original string : \n%s\n\n" s;
-  Printf.printf "Printing the AST :\n"  ;
-  print_ast(d);
-  Printf.printf "It has %d description\n" (count_description d);
   Printf.printf "Corresponding Ntriple string :\n";
   produce_ntriple d
                   

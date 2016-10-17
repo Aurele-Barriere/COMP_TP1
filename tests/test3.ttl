@@ -1,5 +1,5 @@
 <poly117> <version>
   [ <annee> "2007" ;
-    <nbpages> "147" ] ,
+    <nbpages> "147", "2" ] ,
   [ <annee> "2011" ;
-    <nbpages> "163" ] .
+    <nbpages> "163", [ <annee> "2011" ] ] .
