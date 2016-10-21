@@ -5,86 +5,55 @@ open Anonymousparser
 
 (* generating Ntriple string *)
 
-let n_id = ref 0  
 
-let rec anonymous_obj_to_string (o:obj)=
+let rec anonymous_obj_to_string (o:obj) (n_id:int) =
   match o with
-  | I(e) -> " " ^ e
-  | S(t) -> " \"" ^ t ^ "\""
-  | P(pl) -> incr n_id;
-	" _id"^(string_of_int (!n_id))^" .\n"^(plist_to_string pl)
+  | I(e) -> (" " ^ e, n_id)
+  | S(t) -> (" \"" ^ t ^ "\"", n_id)
+  | P(pl) -> let (s_res, n) = plist_to_string pl (n_id + 1) in
+	(" _:id"^(string_of_int (n_id + 1))^s_res, n)
   
-and anonymous_predicate_to_string ((e,ol):predicate) =
+and anonymous_predicate_to_string ((e,ol):predicate) n_id =
     (List.fold_right
-       (fun o l -> 	"_:id" ^ (string_of_int (!n_id)) ^ " <" ^ e ^ ">" ^anonymous_obj_to_string(o) ^ " .\n" ^ l)
-       ol "") 
+       (fun o (l, n) -> 	let (s, n') = (anonymous_obj_to_string o n) in
+        (" .\n_:id" ^ (string_of_int (n_id)) ^ " <" ^ e ^ ">" ^ s  ^ l, (max n' n)))
+       ol ("", n_id)) 
        
-and plist_to_string (pl: predicate list) =
+and plist_to_string (pl: predicate list) n_id =
   (List.fold_right
-    (fun p l -> (anonymous_predicate_to_string p) ^ l)
-     pl "")
+    (fun p (l, n) -> let (s, n') = (anonymous_predicate_to_string p n_id) in (s ^ l, (max n' n)))
+     pl ("", n_id))
   
 
-and obj_to_ntriple (s:entity) (p:entity) (o:obj)=
+and obj_to_ntriple (s:entity) (p:entity) (o:obj) (n_id) =
   match o with
-  | I(e) -> "<"^s^"> "^"<"^p^"> "^"<"^e^">.\n"
-  | S(t) -> "<"^s^"> "^"<"^p^"> "^"\""^t^"\".\n"
-  | P(pl) -> incr n_id;
-	"<"^s^"> "^"<"^p^"> _:id"^(string_of_int (!n_id))^" .\n"^(plist_to_string pl)
+  | I(e) -> ("<"^s^"> "^"<"^p^"> "^"<"^e^">.\n", n_id)
+  | S(t) -> ("<"^s^"> "^"<"^p^"> "^"\""^t^"\".\n", n_id)
+  | P(pl) -> let (s_res, n) = (plist_to_string pl (n_id + 1)) in
+	("<"^s^"> "^"<"^p^"> _:id"^(string_of_int (n_id + 1))^s_res, n)
 
-let predicate_to_ntriple (s:entity) ((e,ol):predicate) =
+let predicate_to_ntriple (s:entity) ((e,ol):predicate) n_id =
     (List.fold_right
-       (fun o l -> (obj_to_ntriple s e o) ^ l)
-       ol "")
+       (fun o (l, n) -> let (s_res, n') = (obj_to_ntriple s e o n) in
+			(s_res ^ " .\n" ^ l, (max n' n)))
+       ol ("", n_id))
 
-let subject_to_ntriple ((e,pl):subject) =
+let subject_to_ntriple ((e,pl):subject) n_id =
     (List.fold_right
-       (fun p l -> (predicate_to_ntriple e p) ^ l)
-       pl "")
+       (fun p (l, n) -> let (s_res, n') = (predicate_to_ntriple e p n) in
+			(s_res  ^ l , (max n' n)))
+       pl ("", n_id))
 
-let document_to_ntriple (sl : document) =
+let document_to_ntriple (sl : document) n_id =
   (List.fold_right
-     (fun s l -> subject_to_ntriple(s) ^ l)
-     sl "")
+     (fun s (l, n) -> let (s_res, n') = subject_to_ntriple s n in
+		(s_res ^ l, (max n' n)))
+     sl ("", n_id))
 
 
                 
 let produce_ntriple (d : document) =
-  Printf.printf "%s" (document_to_ntriple d)
+  let (s, n) = (document_to_ntriple d 0) in
+  Printf.printf "%s" s
 
-(* Counting descriptions *)
-let rec count_description (d : document) =
-  match d with
-  | [] -> 0
-  | h::t -> 1 + count_description t
                
-
-(* Producing XML *)
-let obj_to_xml (p:entity) (o:obj)=
-  match o with
-  | I(e) -> "\t<" ^ p ^ " rdf:resource=\"" ^ e ^ "\"/>\n"
-  | S(t) -> "\t<" ^ p ^ ">" ^ t ^ "</" ^ p ^ ">\n"
-  | P(pl) -> "" (*TODO*)
-
-let predicate_to_xml ((e,ol):predicate) =
-    (List.fold_right
-       (fun o l -> (obj_to_xml e o) ^ l)
-       ol "")
-
-let subject_to_xml ((e,pl):subject) =
-"<rdf:Description rdf:about=\"" ^ e ^ "\">\n" ^
-    (List.fold_right
-       (fun p l -> (predicate_to_xml p) ^ l)
-       pl "") ^
-"</rdf:Description>\n"
-
-let document_to_xml (sl : document) =
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<rdf:RDF\nxml:base=\"http://mydomain.org/myrdf/\"\nxmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\">\n" ^
-  (List.fold_right
-     (fun s l -> subject_to_xml(s) ^ l)
-     sl "") ^
-"</rdf:RDF>\n"
-
-            
-let produce_xml (d : document) =
-  Printf.printf "%s" (document_to_xml d)
